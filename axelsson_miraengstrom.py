@@ -2,14 +2,17 @@ import mysql.connector, re, time
 from mysql.connector import errorcode
 
 # Code is based upon 'cars database' from Code Workshop, written by Ilir Jusufi
-
+# Connecting to the mysql socket in MAMP
 cnx = mysql.connector.connect(user='root',
                               password='root',
                               host='127.0.0.1',
                               unix_socket= '/Applications/MAMP/tmp/mysql/mysql.sock',
                               )
+                              
 DB_NAME = 'quaketournamentsdb'
 cursor = cnx.cursor()
+
+# Read the lines from the database dump file
 dumpfile = open('quaketournamentsdb.sql')
 sqlLines = dumpfile.read()
 
@@ -114,6 +117,7 @@ def playerSubMenu(cursor):
           for age in table:
             print("The average age is: {}".format(age))
 
+      # If the user chose MAX or MIN age, create a new query containing the specific aggregation function they've chosen.
       elif isExec:
         query =  "SELECT name, player_nickname, age, country, earnings FROM players WHERE age = (SELECT {} FROM players)".format(query2)
         cursor.execute(query)
@@ -141,7 +145,7 @@ try:
     cursor.execute("USE {}".format(DB_NAME))
     print("Database '{}' already installed".format(DB_NAME))
 except mysql.connector.Error as error:
-    print("Database {} does not exists.".format(DB_NAME))
+    print("Database {} does not exists.".format(DB_NAME))           # If the database does not exist, we create it and fill it with the sql dump data
     if error.errno == errorcode.ER_BAD_DB_ERROR:
         create_database(cursor, DB_NAME)
         print("Database {} created successfully.".format(DB_NAME))
@@ -200,8 +204,6 @@ while (user_input != 'q'):
 
         cursor.execute(tournamentDetails_query)
 
-        # print("test{}".format(cursor[0]))
-
         for (id, name, date, game, country, prize_pool) in cursor:
           
           tournamentResults_query = "SELECT results.first_place, results.second_place, results.third_place, results.fourth_place, results.fifth_place FROM results WHERE results.tournament_id = {}".format(id)
@@ -239,5 +241,6 @@ while (user_input != 'q'):
   if user_input == '5':
     user_input = playerSubMenu(cursor)
 
+# Close the connections when the application is exited.
 cursor.close()
 cnx.close()
