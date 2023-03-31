@@ -98,11 +98,11 @@ def playerSubMenu(cursor):
 
       
       if user_input2 == '1':
-        query2 = "MAX(players.age)"
+        aggregationFunction = "MAX(players.age)"
         isExec = True
 
       if user_input2 == '2':
-        query2 = "MIN(players.age)"
+        aggregationFunction = "MIN(players.age)"
         isExec = True
       
       
@@ -119,7 +119,7 @@ def playerSubMenu(cursor):
 
       # If the user chose MAX or MIN age, create a new query containing the specific aggregation function they've chosen.
       elif isExec:
-        query =  "SELECT name, player_nickname, age, country, earnings FROM players WHERE age = (SELECT {} FROM players)".format(query2)
+        query =  "SELECT name, player_nickname, age, country, earnings FROM players WHERE age = (SELECT {} FROM players)".format(aggregationFunction)
         cursor.execute(query)
         
         for (name, nickname, age, country, earnings) in cursor:
